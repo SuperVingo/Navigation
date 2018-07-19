@@ -1,0 +1,72 @@
+xml
+ - version - double
+ - encoding - string
+
+osm 
+ - version - double
+ - generator - string
+ - copyright - string
+ - attribution - string 
+ - license - string
+
+bounds
+ - minlat - double
+ - minlon - double 
+ - maxlat - double
+ - maxlon - double
+
+node
+ - id - long
+ - visible - bool
+ - version - int
+ - changeset - long
+ - timestamp - string
+ - user - string
+ - uid - long
+ - lat - double
+ - lon - double
+ - tag - tag
+  - k - string
+  - v - string
+
+way
+ - id - long
+ - visible - bool
+ - version - int
+ - changeset - long
+ - timestamp - string
+ - user - string
+ - uid - long
+ - nd - tag
+  - ref - long
+ - tag - tag
+  - k - string
+  - v - string
+
+relation
+ - id - long
+ - visible - bool
+ - version - int
+ - changeset - long
+ - timestamp - string
+ - user - string
+ - uid - long
+ - member - tag
+  - type - string
+  - ref - long
+  - role - string
+ - tag
+  - k - string
+  - v - string
+
+nd - tag
+ - ref - long
+
+tag - tag
+ - k - string
+ - v - string
+
+member - tag
+ - type - string
+ - ref - long
+ - role - string
