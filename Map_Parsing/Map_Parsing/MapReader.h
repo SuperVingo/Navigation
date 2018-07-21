@@ -68,5 +68,5 @@ public:
 	TagNS::Tag_Bounds * bounds;
 	std::vector<TagNS::Tag_Node> nodes;
 	std::vector<TagNS::Tag_Way> ways;
-	std::vector<TagNS::Tag_Relation> relation;
+	std::vector<TagNS::Tag_Relation> relations;
 };

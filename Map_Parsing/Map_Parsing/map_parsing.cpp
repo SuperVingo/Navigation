@@ -1,17 +1,18 @@
 #include "MapReader.h"
 
-bool GetAttribute(std::string tag, std::string name, int * value)
+bool GetAttribute(std::string tag, const char name[], int * value)
 {
 	int v_index, v2_index, ivalue;
+	char * c_name = (char*)name;
 
-	name += "=\"";
+	strcat_s(c_name, sizeof(name), "=\"");
 
-	v_index = tag.find(name);
+	v_index = tag.find(c_name);
 	v2_index = tag.find("\"", v_index);
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		std::cout << "Can't find " << name.c_str() << "Check the file." << std::endl;
+		std::cout << "Can't find " << name << "Check the file." << std::endl;
 		value = nullptr;
 		return false;
 	}
@@ -28,19 +29,20 @@ bool GetAttribute(std::string tag, std::string name, int * value)
 }
 
 
-bool GetAttribute(std::string tag, std::string name, long * value)
+bool GetAttribute(std::string tag, const char name[], long * value)
 {
 	int v_index, v2_index;
 	long lvalue;
+	char * c_name = (char*)name;
 
-	name += "=\"";
+	strcat_s(c_name, sizeof(name), "=\"");
 
-	v_index = tag.find(name);
+	v_index = tag.find(c_name);
 	v2_index = tag.find('"', v_index);
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		std::cout << "Can't find " << name.c_str() << "Check the file." << std::endl;
+		std::cout << "Can't find " << name << "Check the file." << std::endl;
 		return false;
 	}
 	else
@@ -55,19 +57,20 @@ bool GetAttribute(std::string tag, std::string name, long * value)
 	return true;
 }
 
-bool GetAttribute(std::string tag, std::string name, double * value)
+bool GetAttribute(std::string tag, const char name[], double * value)
 {
 	int v_index, v2_index;
 	double dvalue;
+	char * c_name = (char*)name;
 
-	name += "=\"";
+	strcat_s(c_name, sizeof(name), "=\"");
 
-	v_index = tag.find(name);
+	v_index = tag.find(c_name);
 	v2_index = tag.find('"', v_index);
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		std::cout << "Can't find " << name.c_str() << "Check the file." << std::endl;
+		std::cout << "Can't find " << name << "Check the file." << std::endl;
 		return false;
 	}
 	else
@@ -83,18 +86,19 @@ bool GetAttribute(std::string tag, std::string name, double * value)
 
 }
 
-bool GetAttribute(std::string tag, std::string name, bool * value)
+bool GetAttribute(std::string tag, const char name[], bool * value)
 {
 	int v_index, v2_index;
+	char * c_name = (char*)name;
 
-	name += "=\"";
+	strcat_s(c_name, sizeof(name), "=\"");
 
-	v_index = tag.find(name);
+	v_index = tag.find(c_name);
 	v2_index = tag.find('"', v_index);
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		std::cout << "Can't find " << name.c_str() << "Check the file." << std::endl;
+		std::cout << "Can't find " << name << "Check the file." << std::endl;
 		return false;
 	}
 	else
@@ -111,19 +115,20 @@ bool GetAttribute(std::string tag, std::string name, bool * value)
 
 }
 
-bool GetAttribute(std::string tag, std::string name, char value[])
+bool GetAttribute(std::string tag, const char name[], char value[])
 {
 	int v_index, v2_index;
 	std::string cvalue;
+	char * c_name = (char*)name;
 
-	name += "=\"";
+	strcat_s(c_name, sizeof(name), "=\"");
 
-	v_index = tag.find(name);
+	v_index = tag.find(c_name);
 	v2_index = tag.find('"', v_index);
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		std::cout << "Can't find " << name.c_str() << "Check the file." << std::endl;
+		std::cout << "Can't find " << name << "Check the file." << std::endl;
 		return false;
 	}
 	else
@@ -138,19 +143,20 @@ bool GetAttribute(std::string tag, std::string name, char value[])
 	return true;
 }
 
-bool GetAttribute(std::string tag, std::string name, std::string * value)
+bool GetAttribute(std::string tag, const char name[], std::string * value)
 {
 	int v_index, v2_index;
 	std::string svalue;
+	char * c_name = (char*)name;
 
-	name += "=\"";
+	strcat_s(c_name, sizeof(name), "=\"");
 
-	v_index = tag.find(name);
+	v_index = tag.find(c_name);
 	v2_index = tag.find('"', v_index);
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		std::cout << "Can't find " << name.c_str() << "Check the file." << std::endl;
+		std::cout << "Can't find " << name << "Check the file." << std::endl;
 		return false;
 	}
 	else
@@ -164,25 +170,35 @@ bool GetAttribute(std::string tag, std::string name, std::string * value)
 	return true;
 }
 
-bool GetTag(std::string tag, TagNS::Tag_Tag * value)
-{
-	TagNS::Tag_Tag result;
-	std::string s_k;
-	std::string s_v;
-	
-	GetAttribute(tag, std::string("k"), &s_k);
-	GetAttribute(tag, std::string("v"), &s_v);
-
-	return true;
-}
-
-bool GetND(std::string tag, TagNS::Tag_nd * value)
+TagNS::Tag_nd GetND(std::string tag)
 {
 	long ref;
 	
-	GetAttribute(tag, std::string("ref"), &ref);
+	GetAttribute(tag, "ref", &ref);
 
-	*value = TagNS::Tag_nd();
+	return TagNS::Tag_nd(ref);
+}
 
-	return true;
+TagNS::Tag_Tag GetTag(std::string tag)
+{
+	std::string s_k;
+	std::string s_v;
+
+	GetAttribute(tag, "k", &s_k);
+	GetAttribute(tag, "v", &s_v);
+
+	return TagNS::Tag_Tag(s_k, s_v);
+}
+
+TagNS::Tag_Member GetMember(std::string tag)
+{
+	std::string s_type;
+	long ref;
+	std::string s_role;
+
+	GetAttribute(tag, "type", &s_type);
+	GetAttribute(tag, "ref", &ref);
+	GetAttribute(tag, "role", &s_role);
+
+	return TagNS::Tag_Member(s_type, ref, s_role);
 }

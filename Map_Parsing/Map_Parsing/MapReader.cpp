@@ -79,10 +79,10 @@ bool MapReader::Parshing_XML(std::string tag_line)
 	std::string s_encoding;
 	double d_version;
 
-	if (!GetAttribute(tag_line, std::string("version"), &d_version))
+	if (!GetAttribute(tag_line, "version", &d_version))
 		return false;
 
-	if (!GetAttribute(tag_line, std::string("encoding"), &s_encoding))
+	if (!GetAttribute(tag_line, "encoding", &s_encoding))
 		return false;
 
 	xml->version = d_version;
@@ -99,19 +99,19 @@ bool MapReader::Parshing_OSM(std::string tag_line)
 	std::string s_attribution;
 	std::string s_license;
 
-	if (!GetAttribute(tag_line, std::string("version"), &d_version))
+	if (!GetAttribute(tag_line, "version", &d_version))
 		return false;
 
-	if (!GetAttribute(tag_line, std::string("generator"), &s_generator))
+	if (!GetAttribute(tag_line, "generator", &s_generator))
 		return false;
 
-	if (!GetAttribute(tag_line, std::string("copyright"), &s_copyright))
+	if (!GetAttribute(tag_line, "copyright", &s_copyright))
 		return false;
 
-	if (!GetAttribute(tag_line, std::string("attribution"), &s_attribution))
+	if (!GetAttribute(tag_line, "attribution", &s_attribution))
 		return false;
 
-	if (!GetAttribute(tag_line, std::string("license"), &s_license))
+	if (!GetAttribute(tag_line, "license", &s_license))
 		return false;
 
 	osm->version = d_version;
@@ -130,18 +130,23 @@ bool MapReader::Parshing_Bounds(std::string tag_line)
 	double d_maxlat;
 	double d_maxlon;
 
-	if (!GetAttribute(tag_line, std::string("version"), &d_minlat))
+	if (!GetAttribute(tag_line, "version", &d_minlat))
 		return false;
 
-	if (!GetAttribute(tag_line, std::string("minlon"), &d_minlon))
+	if (!GetAttribute(tag_line, "minlon", &d_minlon))
 		return false;
 
-	if (!GetAttribute(tag_line, std::string("maxlat"), &d_maxlat))
+	if (!GetAttribute(tag_line, "maxlat", &d_maxlat))
 		return false;
 
-	if (!GetAttribute(tag_line, std::string("maxlon"), &d_maxlon))
+	if (!GetAttribute(tag_line, "maxlon", &d_maxlon))
 		return false;
 		
+	bounds->minlat = d_minlat;
+	bounds->minlon = d_minlon;
+	bounds->maxlat = d_maxlat;
+	bounds->maxlon = d_maxlon;
+
 	return true;
 }
 
@@ -158,31 +163,162 @@ bool MapReader::Parshing_Node(std::string tag_line)
 	double d_lon;
 	std::vector<TagNS::Tag_Tag> v_tag;
 
-	GetAttribute(tag_line, std::string("id"), &l_id);
-	GetAttribute(tag_line, std::string("visible"), &b_visible);
-	GetAttribute(tag_line, std::string("version"), &i_version);
-	GetAttribute(tag_line, std::string("changeset"), &l_changeset);
-	GetAttribute(tag_line, std::string("timestamp"), &s_timestamp);
-	GetAttribute(tag_line, std::string("uid"), &l_uid);
-	GetAttribute(tag_line, std::string("lat"), &d_lat);
-	GetAttribute(tag_line, std::string("lon"), &d_lon);
+	GetAttribute(tag_line, "id", &l_id);
+	GetAttribute(tag_line, "visible", &b_visible);
+	GetAttribute(tag_line, "version", &i_version);
+	GetAttribute(tag_line, "changeset", &l_changeset);
+	GetAttribute(tag_line, "timestamp", &s_timestamp);
+	GetAttribute(tag_line, "user", &s_user);
+	GetAttribute(tag_line, "uid", &l_uid);
+	GetAttribute(tag_line, "lat", &d_lat);
+	GetAttribute(tag_line, "lon", &d_lon);
 
 	bool exit = false;
 
 	while (!exit)
 	{
+		int v_index = 0, v2_index = 0;
+		v_index = tag_line.find("<tag", v2_index + 1);
+		v2_index = tag_line.find("/>", v_index + 1);
 
+		if (v_index == -1)
+		{
+			exit = true;
+			continue;
+		}
+
+		std::string temp = tag_line.substr(v_index, v2_index);
+		std::string k, v;
+		
+		GetAttribute(temp, "k", &k);
+		GetAttribute(temp, "v", &v);
+
+		v_tag.push_back(TagNS::Tag_Tag(k, v));
 	}
+
+	nodes.push_back(TagNS::Tag_Node(l_id, b_visible, i_version, l_changeset, s_timestamp, s_user, l_uid, d_lat, d_lon, v_tag));
 
 	return true;
 }
 
 bool MapReader::Parshing_Way(std::string tag_line)
 {
-	return false;
+	long l_id;
+	bool b_visible;
+	int i_version;
+	long l_changeset;
+	std::string s_timestamp;
+	std::string s_user;
+	long l_uid;
+	std::vector<TagNS::Tag_nd> v_nd;
+	std::vector<TagNS::Tag_Tag> v_tag;
+
+	GetAttribute(tag_line, "id", &l_id);
+	GetAttribute(tag_line, "visible", &b_visible);
+	GetAttribute(tag_line, "version", &i_version);
+	GetAttribute(tag_line, "changeset", &l_changeset);
+	GetAttribute(tag_line, "timestamp", &s_timestamp);
+	GetAttribute(tag_line, "user", &s_user);
+	GetAttribute(tag_line, "uid", &l_uid);
+
+	bool exit = false;
+
+	while (!exit)
+	{
+		int v_index = 0, v2_index = 0;
+		v_index = tag_line.find("<nd", v2_index + 1);
+		v2_index = tag_line.find("/>", v_index + 1);
+
+		if (v_index == -1)
+		{
+			exit = true;
+			continue;
+		}
+
+		std::string temp = tag_line.substr(v_index, v2_index);
+
+		v_nd.push_back(GetND(temp));
+	}
+
+	exit = false;
+
+	while (!exit)
+	{
+		int v_index = 0, v2_index = 0;
+		v_index = tag_line.find("<tag", v2_index + 1);
+		v2_index = tag_line.find("/>", v_index + 1);
+
+		if (v_index == -1)
+		{
+			exit = true;
+			continue;
+		}
+
+		std::string temp = tag_line.substr(v_index, v2_index);
+
+		v_tag.push_back(GetTag(temp));
+	}
+
+	ways.push_back(TagNS::Tag_Way(l_id, b_visible, i_version, l_changeset, s_timestamp, s_user, l_uid, v_nd, v_tag));
 }
 
 bool MapReader::Parshing_Relation(std::string tag_line)
 {
-	return false;
+	long l_id;
+	bool b_visible;
+	int i_version;
+	long l_changeset;
+	std::string s_timestamp;
+	std::string s_user;
+	long l_uid;
+	std::vector<TagNS::Tag_Member> v_member;
+	std::vector<TagNS::Tag_Tag> v_tag;
+
+	GetAttribute(tag_line, "id", &l_id);
+	GetAttribute(tag_line, "visible", &b_visible);
+	GetAttribute(tag_line, "version", &i_version);
+	GetAttribute(tag_line, "changeset", &l_changeset);
+	GetAttribute(tag_line, "timestamp", &s_timestamp);
+	GetAttribute(tag_line, "user", &s_user);
+	GetAttribute(tag_line, "uid", &l_uid);
+
+	bool exit = false;
+
+	while (!exit)
+	{
+		int v_index = 0, v2_index = 0;
+		v_index = tag_line.find("<member", v2_index + 1);
+		v2_index = tag_line.find("/>", v_index + 1);
+
+		if (v_index == -1)
+		{
+			exit = true;
+			continue;
+		}
+
+		std::string temp = tag_line.substr(v_index, v2_index);
+
+		v_member.push_back(GetMember(temp));
+	}
+
+	exit = false;
+
+	while (!exit)
+	{
+		int v_index = 0, v2_index = 0;
+		v_index = tag_line.find("<tag", v2_index + 1);
+		v2_index = tag_line.find("/>", v_index + 1);
+
+		if (v_index == -1)
+		{
+			exit = true;
+			continue;
+		}
+
+		std::string temp = tag_line.substr(v_index, v2_index);
+
+		v_tag.push_back(GetTag(temp));
+	}
+
+	relations.push_back(TagNS::Tag_Relation(l_id, b_visible, i_version, l_changeset, s_timestamp, s_user, l_uid, v_member, v_tag));
 }
