@@ -12,7 +12,7 @@ bool GetAttribute(std::string tag, const char name[], int * value)
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		std::cout << "Can't find " << name << "Check the file." << std::endl;
+		FindError(name);
 		value = nullptr;
 		return false;
 	}
@@ -42,7 +42,7 @@ bool GetAttribute(std::string tag, const char name[], long * value)
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		std::cout << "Can't find " << name << "Check the file." << std::endl;
+		FindError(name);
 		return false;
 	}
 	else
@@ -70,7 +70,7 @@ bool GetAttribute(std::string tag, const char name[], double * value)
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		std::cout << "Can't find " << name << "Check the file." << std::endl;
+		FindError(name);
 		return false;
 	}
 	else
@@ -98,7 +98,7 @@ bool GetAttribute(std::string tag, const char name[], bool * value)
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		std::cout << "Can't find " << name << "Check the file." << std::endl;
+		FindError(name);
 		return false;
 	}
 	else
@@ -128,7 +128,7 @@ bool GetAttribute(std::string tag, const char name[], char value[])
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		std::cout << "Can't find " << name << "Check the file." << std::endl;
+		FindError(name);
 		return false;
 	}
 	else
@@ -156,7 +156,7 @@ bool GetAttribute(std::string tag, const char name[], std::string * value)
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		std::cout << "Can't find " << name << "Check the file." << std::endl;
+		FindError(name);
 		return false;
 	}
 	else
@@ -170,35 +170,47 @@ bool GetAttribute(std::string tag, const char name[], std::string * value)
 	return true;
 }
 
-TagNS::Tag_nd GetND(std::string tag)
+bool GetND(std::string tag, TagNS::Tag_nd * value)
 {
 	long ref;
 	
-	GetAttribute(tag, "ref", &ref);
+	if (!GetAttribute(tag, "ref", &ref))
+		return false;
 
-	return TagNS::Tag_nd(ref);
+	*value = TagNS::Tag_nd(ref);
+
+	return true;
 }
 
-TagNS::Tag_Tag GetTag(std::string tag)
+bool GetTag(std::string tag, TagNS::Tag_Tag * value)
 {
 	std::string s_k;
 	std::string s_v;
 
-	GetAttribute(tag, "k", &s_k);
-	GetAttribute(tag, "v", &s_v);
+	if (!GetAttribute(tag, "k", &s_k))
+		return false;
+	if (!GetAttribute(tag, "v", &s_v))
+		return false;
 
-	return TagNS::Tag_Tag(s_k, s_v);
+	*value = TagNS::Tag_Tag(s_k, s_v);
+
+	return true;
 }
 
-TagNS::Tag_Member GetMember(std::string tag)
+bool GetMember(std::string tag, TagNS::Tag_Member * value)
 {
 	std::string s_type;
 	long ref;
 	std::string s_role;
 
-	GetAttribute(tag, "type", &s_type);
-	GetAttribute(tag, "ref", &ref);
-	GetAttribute(tag, "role", &s_role);
+	if (!GetAttribute(tag, "type", &s_type))
+		return false;
+	if (!GetAttribute(tag, "ref", &ref))
+		return false;
+	if (!GetAttribute(tag, "role", &s_role))
+		return false;
 
-	return TagNS::Tag_Member(s_type, ref, s_role);
+	*value = TagNS::Tag_Member(s_type, ref, s_role);
+
+	return true;
 }

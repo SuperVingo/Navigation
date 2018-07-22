@@ -1,3 +1,4 @@
+#include <iostream>
 #include <fstream>
 #include <stdlib.h>
 #include <iomanip>
@@ -8,39 +9,44 @@ bool MapReader::MapUpload(const char * filename)
 	return false;
 }
 
-void MapReader::Print_XML()
+void MapReader::Print_XML_in_terminal()
+{
+	std::cout.setf(std::ios::fixed);
+	std::cout << "-------------------- XML Tag -----------------------" << std::endl;
+	std::cout << "	Version : " << std::cout.precision(2) << xml->version << std::endl;
+	std::cout << "	Encoding : " << xml->encoding.c_str() << std::endl;
+	std::cout << "----------------------------------------------------" << std::endl;
+}
+
+void MapReader::Print_OSM_in_terminal()
 {
 }
 
-void MapReader::Print_OSM()
+void MapReader::Print_Bounds_in_terminal()
 {
 }
 
-void MapReader::Print_Bounds()
+void MapReader::Print_Node_Index_in_terminal(int index)
 {
 }
 
-void MapReader::Print_Node_Index(int index)
+void MapReader::Print_Node_ID_in_terminal(int id)
 {
 }
 
-void MapReader::Print_Node_ID(int id)
+void MapReader::Print_Way_Index_in_terminal(int index)
 {
 }
 
-void MapReader::Print_Way_Index(int index)
+void MapReader::Print_Way_ID_in_terminal(int id)
 {
 }
 
-void MapReader::Print_Way_ID(int id)
+void MapReader::Print_Relation_Index_in_terminal(int index)
 {
 }
 
-void MapReader::Print_Relation_Index(int index)
-{
-}
-
-void MapReader::Print_Relation_ID(int id)
+void MapReader::Print_Relation_ID_in_terminal(int id)
 {
 }
 
@@ -235,9 +241,9 @@ bool MapReader::Parshing_Way(std::string tag_line)
 			continue;
 		}
 
-		std::string temp = tag_line.substr(v_index, v2_index);
-
-		v_nd.push_back(GetND(temp));
+		std::string tag = tag_line.substr(v_index, v2_index);
+		TagNS::Tag_Tag temp
+		v_nd.push_back(GetND(tag));
 	}
 
 	exit = false;
@@ -254,12 +260,20 @@ bool MapReader::Parshing_Way(std::string tag_line)
 			continue;
 		}
 
-		std::string temp = tag_line.substr(v_index, v2_index);
+		std::string tag = tag_line.substr(v_index, v2_index);
+		TagNS::Tag_Tag temp;
 
-		v_tag.push_back(GetTag(temp));
+		if (!GetTag(tag, &temp))
+		{
+			std::cout
+		}
+
+		v_tag.push_back(temp);
 	}
 
 	ways.push_back(TagNS::Tag_Way(l_id, b_visible, i_version, l_changeset, s_timestamp, s_user, l_uid, v_nd, v_tag));
+
+	return true;
 }
 
 bool MapReader::Parshing_Relation(std::string tag_line)
@@ -321,4 +335,6 @@ bool MapReader::Parshing_Relation(std::string tag_line)
 	}
 
 	relations.push_back(TagNS::Tag_Relation(l_id, b_visible, i_version, l_changeset, s_timestamp, s_user, l_uid, v_member, v_tag));
+
+	return true;
 }

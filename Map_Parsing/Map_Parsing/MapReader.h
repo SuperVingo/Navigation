@@ -14,20 +14,21 @@ public:
 	bool MapUpload(const char * filename);
 
 public:
-	void Print_XML();
+	// In Terminal Output
+	void Print_XML_in_terminal();
 
-	void Print_OSM();
+	void Print_OSM_in_terminal();
 
-	void Print_Bounds();
+	void Print_Bounds_in_terminal();
 
-	void Print_Node_Index(int index);
-	void Print_Node_ID(int id);
+	void Print_Node_Index_in_terminal(int index);
+	void Print_Node_ID_in_terminal(int id);
 
-	void Print_Way_Index(int index);
-	void Print_Way_ID(int id);
+	void Print_Way_Index_in_terminal(int index);
+	void Print_Way_ID_in_terminal(int id);
 
-	void Print_Relation_Index(int index);
-	void Print_Relation_ID(int id);
+	void Print_Relation_Index_in_terminal(int index);
+	void Print_Relation_ID_in_terminal(int id);
 
 public:
 	TagNS::Tag_XML* Get_XML() { return xml; }
@@ -44,7 +45,7 @@ public:
 	bool Get_Way_Index(TagNS::Tag_Way * way, int index);
 	bool Get_Way_ID(TagNS::Tag_Way * way, int id);
 
-	std::vector<TagNS::Tag_Relation> Get_Relations() { return relation; }
+	std::vector<TagNS::Tag_Relation> Get_Relations() { return relations; }
 	bool Get_Relation_Index(TagNS::Tag_Relation * relation, int index);
 	bool Get_Relation_ID(TagNS::Tag_Relation * relation, int id);
 
