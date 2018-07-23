@@ -4,6 +4,12 @@
 #include <iomanip>
 #include "MapReader.h"
 
+#define ERROR_ATTR( x, y ) { AttributeError(x, y); \
+							 return false; }
+
+#define ERROR_FIND( x, y ) { FindError(x, y); \
+							 return false; }
+
 bool MapReader::MapUpload(const char * filename)
 {
 	return false;
@@ -20,18 +26,64 @@ void MapReader::Print_XML_in_terminal()
 
 void MapReader::Print_OSM_in_terminal()
 {
+	std::cout.setf(std::ios::fixed);
+	std::cout << "-------------------- OSM Tag -----------------------" << std::endl;
+	std::cout << "	Version : " << std::cout.precision(2) << osm->version << std::endl;
+	std::cout << "	Generator : " << osm->generator.c_str() << std::endl;
+	std::cout << "	Copyright : " << osm->copyright.c_str() << std::endl;
+	std::cout << "	Attribution : " << osm->attribution.c_str() << std::endl;
+	std::cout << "	License : " << osm->license.c_str() << std::endl;
+	std::cout << "----------------------------------------------------" << std::endl;
 }
 
 void MapReader::Print_Bounds_in_terminal()
 {
+	std::cout.setf(std::ios::fixed);
+	std::cout << "-------------------- Bounds Tag -----------------------" << std::endl;
+	std::cout << "	Min Latitude : " << std::cout.precision(7) << bounds->minlat << std::endl;
+	std::cout << "	Min Longitude : " << std::cout.precision(7) << bounds->minlon << std::endl;
+	std::cout << "	Max Latitude : " << std::cout.precision(7) << bounds->maxlat << std::endl;
+	std::cout << "	Max Longitude : " << std::cout.precision(7) << bounds->maxlon << std::endl;
+	std::cout << "----------------------------------------------------" << std::endl;
+}
+
+void MapReader::Print_Node_in_terminal(TagNS::Tag_Node node)
+{
+	std::cout.setf(std::ios::fixed);
+	std::cout << "-------------------- Node Tag -----------------------" << std::endl;
+	std::cout << "	ID : " << node.id << std::endl;
+	std::cout << "	Visible : " << node.visible << std::endl;
+	std::cout << "	Version : " << node.version << std::endl;
+	std::cout << "	Changeset : " << node.changeset << std::endl;
+	std::cout << "	Timestamp : " << node.timestamp.c_str() << std::endl;
+	std::cout << "	User : " << node.user.c_str() << std::endl;
+	std::cout << "	UID : " << node.uid << std::endl;
+	std::cout << "	Latitude : " << node.lat << std::endl;
+	std::cout << "	Longitude : " << node.lon << std::endl;
+
+	for (int i = 0; i < node.tag.size(); i++)
+	{
+		std::cout << std::endl << i << " Tag" << std::endl;
+		Print_Tag(node.tag[i]);
+		std::cout << std::endl;
+	}
+
+	std::cout << "----------------------------------------------------" << std::endl;
 }
 
 void MapReader::Print_Node_Index_in_terminal(int index)
 {
+	Print_Node_in_terminal(nodes[index - 1]);
 }
 
 void MapReader::Print_Node_ID_in_terminal(int id)
 {
+	for(int i = 0; i < nodes.size(); i++)
+		if (nodes[i].id == id)
+		{
+			Print_Node_in_terminal(nodes[i]);
+			break;
+		}
 }
 
 void MapReader::Print_Way_Index_in_terminal(int index)
@@ -47,6 +99,20 @@ void MapReader::Print_Relation_Index_in_terminal(int index)
 }
 
 void MapReader::Print_Relation_ID_in_terminal(int id)
+{
+}
+
+void MapReader::Print_Tag(TagNS::Tag_Tag tag)
+{
+	std::cout << "k : " << tag.k.c_str() << std::endl;
+	std::cout << "v : " << tag.v.c_str() << std::endl;
+}
+
+void MapReader::Print_nd(TagNS::Tag_nd nd)
+{
+}
+
+void MapReader::Print_Member(TagNS::Tag_Member member)
 {
 }
 
@@ -86,10 +152,10 @@ bool MapReader::Parshing_XML(std::string tag_line)
 	double d_version;
 
 	if (!GetAttribute(tag_line, "version", &d_version))
-		return false;
+		ERROR_ATTR("XML - version", " ");
 
 	if (!GetAttribute(tag_line, "encoding", &s_encoding))
-		return false;
+		ERROR_ATTR("XML - encoding", " ");
 
 	xml->version = d_version;
 	xml->encoding = s_encoding;
@@ -106,19 +172,19 @@ bool MapReader::Parshing_OSM(std::string tag_line)
 	std::string s_license;
 
 	if (!GetAttribute(tag_line, "version", &d_version))
-		return false;
+		ERROR_ATTR("OSM - version", " ");
 
 	if (!GetAttribute(tag_line, "generator", &s_generator))
-		return false;
+		ERROR_ATTR("OSM - generator", " ");
 
 	if (!GetAttribute(tag_line, "copyright", &s_copyright))
-		return false;
+		ERROR_ATTR("OSM - copyright", " ");
 
 	if (!GetAttribute(tag_line, "attribution", &s_attribution))
-		return false;
+		ERROR_ATTR("OSM - attribution", " ");
 
 	if (!GetAttribute(tag_line, "license", &s_license))
-		return false;
+		ERROR_ATTR("OSM - license", " ");
 
 	osm->version = d_version;
 	osm->generator = s_generator;
@@ -137,16 +203,16 @@ bool MapReader::Parshing_Bounds(std::string tag_line)
 	double d_maxlon;
 
 	if (!GetAttribute(tag_line, "version", &d_minlat))
-		return false;
+		ERROR_ATTR("Bounds - version", " ");
 
 	if (!GetAttribute(tag_line, "minlon", &d_minlon))
-		return false;
+		ERROR_ATTR("Bounds - minlon", " ");
 
 	if (!GetAttribute(tag_line, "maxlat", &d_maxlat))
-		return false;
+		ERROR_ATTR("Bounds - maxlat", " ");
 
 	if (!GetAttribute(tag_line, "maxlon", &d_maxlon))
-		return false;
+		ERROR_ATTR("Bounds - maxlon", " ");
 		
 	bounds->minlat = d_minlat;
 	bounds->minlon = d_minlon;
@@ -157,7 +223,7 @@ bool MapReader::Parshing_Bounds(std::string tag_line)
 }
 
 bool MapReader::Parshing_Node(std::string tag_line)
-{	
+{
 	long l_id;
 	bool b_visible;
 	int i_version;
@@ -169,15 +235,32 @@ bool MapReader::Parshing_Node(std::string tag_line)
 	double d_lon;
 	std::vector<TagNS::Tag_Tag> v_tag;
 
-	GetAttribute(tag_line, "id", &l_id);
-	GetAttribute(tag_line, "visible", &b_visible);
-	GetAttribute(tag_line, "version", &i_version);
-	GetAttribute(tag_line, "changeset", &l_changeset);
-	GetAttribute(tag_line, "timestamp", &s_timestamp);
-	GetAttribute(tag_line, "user", &s_user);
-	GetAttribute(tag_line, "uid", &l_uid);
-	GetAttribute(tag_line, "lat", &d_lat);
-	GetAttribute(tag_line, "lon", &d_lon);
+	if (!GetAttribute(tag_line, "id", &l_id))
+		ERROR_ATTR("Node - id", " ");
+
+	if (!GetAttribute(tag_line, "visible", &b_visible))
+		ERROR_ATTR("Node - visible", " ")
+
+	if (!GetAttribute(tag_line, "version", &i_version))
+		ERROR_ATTR("Node - version", " ");
+
+	if (!GetAttribute(tag_line, "changeset", &l_changeset))
+		ERROR_ATTR("Node - changeset", " ");
+
+	if (!GetAttribute(tag_line, "timestamp", &s_timestamp))
+		ERROR_ATTR("Node - timestamp", " ");
+
+	if (!GetAttribute(tag_line, "user", &s_user))
+		ERROR_ATTR("Node - user", " ");
+
+	if (!GetAttribute(tag_line, "uid", &l_uid))
+		ERROR_ATTR("Node - uid", " ");
+
+	if (!GetAttribute(tag_line, "lat", &d_lat))
+		ERROR_ATTR("Node - lat", " ");
+
+	if (!GetAttribute(tag_line, "lon", &d_lon))
+		ERROR_ATTR("Node - lon", " ");
 
 	bool exit = false;
 
@@ -187,8 +270,9 @@ bool MapReader::Parshing_Node(std::string tag_line)
 		v_index = tag_line.find("<tag", v2_index + 1);
 		v2_index = tag_line.find("/>", v_index + 1);
 
-		if (v_index == -1)
+		if (v_index == -1 || v2_index == -1)
 		{
+			ERROR_FIND("Node - Tag", " ");
 			exit = true;
 			continue;
 		}
@@ -196,8 +280,10 @@ bool MapReader::Parshing_Node(std::string tag_line)
 		std::string temp = tag_line.substr(v_index, v2_index);
 		std::string k, v;
 		
-		GetAttribute(temp, "k", &k);
-		GetAttribute(temp, "v", &v);
+		if (!GetAttribute(temp, "k", &k))
+			ERROR_ATTR("Node - Tag - k", " ");
+		if (!GetAttribute(temp, "v", &v))
+			ERROR_ATTR("Node - Tag - v", " ");
 
 		v_tag.push_back(TagNS::Tag_Tag(k, v));
 	}
@@ -219,13 +305,26 @@ bool MapReader::Parshing_Way(std::string tag_line)
 	std::vector<TagNS::Tag_nd> v_nd;
 	std::vector<TagNS::Tag_Tag> v_tag;
 
-	GetAttribute(tag_line, "id", &l_id);
-	GetAttribute(tag_line, "visible", &b_visible);
-	GetAttribute(tag_line, "version", &i_version);
-	GetAttribute(tag_line, "changeset", &l_changeset);
-	GetAttribute(tag_line, "timestamp", &s_timestamp);
-	GetAttribute(tag_line, "user", &s_user);
-	GetAttribute(tag_line, "uid", &l_uid);
+	if (!GetAttribute(tag_line, "id", &l_id))
+		ERROR_ATTR("Way - id", " ");
+
+	if (!GetAttribute(tag_line, "visible", &b_visible))
+		ERROR_ATTR("Way - visible", " ");
+
+	if (!GetAttribute(tag_line, "version", &i_version))
+		ERROR_ATTR("Way - version", " ");
+
+	if (!GetAttribute(tag_line, "changeset", &l_changeset))
+		ERROR_ATTR("Way - changeset", " ");
+
+	if (!GetAttribute(tag_line, "timestamp", &s_timestamp))
+		ERROR_ATTR("Way - timestamp", " ");
+
+	if (!GetAttribute(tag_line, "user", &s_user))
+		ERROR_ATTR("Way - user", " ");
+
+	if (!GetAttribute(tag_line, "uid", &l_uid))
+		ERROR_ATTR("Way - uid", " ");
 
 	bool exit = false;
 
@@ -242,8 +341,11 @@ bool MapReader::Parshing_Way(std::string tag_line)
 		}
 
 		std::string tag = tag_line.substr(v_index, v2_index);
-		TagNS::Tag_Tag temp
-		v_nd.push_back(GetND(tag));
+		TagNS::Tag_nd temp;
+		if (!GetND(tag, &temp))
+			ERROR_ATTR("Way - nd", " ");
+
+		v_nd.push_back(temp);
 	}
 
 	exit = false;
@@ -264,9 +366,7 @@ bool MapReader::Parshing_Way(std::string tag_line)
 		TagNS::Tag_Tag temp;
 
 		if (!GetTag(tag, &temp))
-		{
-			std::cout
-		}
+			ERROR_ATTR("Way - Tag", " ");
 
 		v_tag.push_back(temp);
 	}
@@ -288,13 +388,26 @@ bool MapReader::Parshing_Relation(std::string tag_line)
 	std::vector<TagNS::Tag_Member> v_member;
 	std::vector<TagNS::Tag_Tag> v_tag;
 
-	GetAttribute(tag_line, "id", &l_id);
-	GetAttribute(tag_line, "visible", &b_visible);
-	GetAttribute(tag_line, "version", &i_version);
-	GetAttribute(tag_line, "changeset", &l_changeset);
-	GetAttribute(tag_line, "timestamp", &s_timestamp);
-	GetAttribute(tag_line, "user", &s_user);
-	GetAttribute(tag_line, "uid", &l_uid);
+	if (!GetAttribute(tag_line, "id", &l_id))
+		ERROR_ATTR("Relation - id", " ");
+
+	if (!GetAttribute(tag_line, "visible", &b_visible))
+		ERROR_ATTR("Relation - visible", " ");
+
+	if (!GetAttribute(tag_line, "version", &i_version))
+		ERROR_ATTR("Relation - version", " ");
+
+	if (!GetAttribute(tag_line, "changeset", &l_changeset))
+		ERROR_ATTR("Relation - changeset", " ");
+
+	if (!GetAttribute(tag_line, "timestamp", &s_timestamp))
+		ERROR_ATTR("Relation - timestamp", " ");
+
+	if (!GetAttribute(tag_line, "user", &s_user))
+		ERROR_ATTR("Relation - user", " ");
+
+	if (!GetAttribute(tag_line, "uid", &l_uid))
+		ERROR_ATTR("Relation - uid", " ");
 
 	bool exit = false;
 
@@ -310,9 +423,13 @@ bool MapReader::Parshing_Relation(std::string tag_line)
 			continue;
 		}
 
-		std::string temp = tag_line.substr(v_index, v2_index);
+		std::string tag = tag_line.substr(v_index, v2_index);
+		TagNS::Tag_Member temp;
 
-		v_member.push_back(GetMember(temp));
+		if (!GetMember(tag, &temp))
+			ERROR_ATTR("Relation - Member", " ");
+
+		v_member.push_back(temp);
 	}
 
 	exit = false;
@@ -329,9 +446,13 @@ bool MapReader::Parshing_Relation(std::string tag_line)
 			continue;
 		}
 
-		std::string temp = tag_line.substr(v_index, v2_index);
+		std::string tag = tag_line.substr(v_index, v2_index);
+		TagNS::Tag_Tag temp;
 
-		v_tag.push_back(GetTag(temp));
+		if (!GetTag(tag, &temp))
+			ERROR_ATTR("Relation - Tag", " ");
+
+		v_tag.push_back(temp);
 	}
 
 	relations.push_back(TagNS::Tag_Relation(l_id, b_visible, i_version, l_changeset, s_timestamp, s_user, l_uid, v_member, v_tag));

@@ -1,5 +1,11 @@
 #include "MapReader.h"
 
+#define ERROR_ATTR( x, y ) { AttributeError(x, y); \
+							 return false; }
+
+#define ERROR_FIND( x, y ) { FindError(x, y); \
+							 return false; }
+
 bool GetAttribute(std::string tag, const char name[], int * value)
 {
 	int v_index, v2_index, ivalue;
@@ -12,7 +18,7 @@ bool GetAttribute(std::string tag, const char name[], int * value)
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		FindError(name);
+		ERROR_FIND(name, " ");
 		value = nullptr;
 		return false;
 	}
@@ -42,7 +48,7 @@ bool GetAttribute(std::string tag, const char name[], long * value)
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		FindError(name);
+		ERROR_FIND(name, " ");
 		return false;
 	}
 	else
@@ -70,7 +76,7 @@ bool GetAttribute(std::string tag, const char name[], double * value)
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		FindError(name);
+		ERROR_FIND(name, " ");
 		return false;
 	}
 	else
@@ -98,7 +104,7 @@ bool GetAttribute(std::string tag, const char name[], bool * value)
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		FindError(name);
+		ERROR_FIND(name, " ");
 		return false;
 	}
 	else
@@ -128,7 +134,7 @@ bool GetAttribute(std::string tag, const char name[], char value[])
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		FindError(name);
+		ERROR_FIND(name, " ");
 		return false;
 	}
 	else
@@ -156,7 +162,7 @@ bool GetAttribute(std::string tag, const char name[], std::string * value)
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		FindError(name);
+		ERROR_FIND(name, " ");
 		return false;
 	}
 	else
@@ -175,7 +181,7 @@ bool GetND(std::string tag, TagNS::Tag_nd * value)
 	long ref;
 	
 	if (!GetAttribute(tag, "ref", &ref))
-		return false;
+		ERROR_ATTR("Tag - k", " ");
 
 	*value = TagNS::Tag_nd(ref);
 
@@ -188,9 +194,10 @@ bool GetTag(std::string tag, TagNS::Tag_Tag * value)
 	std::string s_v;
 
 	if (!GetAttribute(tag, "k", &s_k))
-		return false;
+		ERROR_ATTR("Tag - k", " ");
+
 	if (!GetAttribute(tag, "v", &s_v))
-		return false;
+		ERROR_ATTR("Tag - v", " ");
 
 	*value = TagNS::Tag_Tag(s_k, s_v);
 
@@ -204,11 +211,14 @@ bool GetMember(std::string tag, TagNS::Tag_Member * value)
 	std::string s_role;
 
 	if (!GetAttribute(tag, "type", &s_type))
-		return false;
+		ERROR_ATTR("type", " ");
+
 	if (!GetAttribute(tag, "ref", &ref))
-		return false;
+		ERROR_ATTR("ref", " ");
+
 	if (!GetAttribute(tag, "role", &s_role))
-		return false;
+		ERROR_ATTR("role", " ");
+
 
 	*value = TagNS::Tag_Member(s_type, ref, s_role);
 

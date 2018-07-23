@@ -21,14 +21,20 @@ public:
 
 	void Print_Bounds_in_terminal();
 
+	void Print_Node_in_terminal(TagNS::Tag_Node node);
 	void Print_Node_Index_in_terminal(int index);
 	void Print_Node_ID_in_terminal(int id);
 
+	void Print_Way_in_terminal(TagNS::Tag_Way node);
 	void Print_Way_Index_in_terminal(int index);
 	void Print_Way_ID_in_terminal(int id);
 
 	void Print_Relation_Index_in_terminal(int index);
 	void Print_Relation_ID_in_terminal(int id);
+
+	void Print_Tag(TagNS::Tag_Tag tag);
+	void Print_nd(TagNS::Tag_nd nd);
+	void Print_Member(TagNS::Tag_Member member);
 
 public:
 	TagNS::Tag_XML* Get_XML() { return xml; }
