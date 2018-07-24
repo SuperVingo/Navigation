@@ -1,9 +1,9 @@
 #include "MapReader.h"
 
-#define ERROR_ATTR( x, y ) { AttributeError(x, y); \
+#define ERROR_ATTR( x, y ) { AttributeError_in_terminal(x, y); \
 							 return false; }
 
-#define ERROR_FIND( x, y ) { FindError(x, y); \
+#define ERROR_FIND( x, y ) { FindError_in_terminal(x, y); \
 							 return false; }
 
 bool GetAttribute(std::string tag, const char name[], int * value)

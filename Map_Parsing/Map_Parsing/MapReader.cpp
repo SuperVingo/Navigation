@@ -2,18 +2,73 @@
 #include <fstream>
 #include <stdlib.h>
 #include <iomanip>
+#include <string>
 #include "MapReader.h"
 
-#define ERROR_ATTR( x, y ) { AttributeError(x, y); \
+#define ERROR_ATTR( x, y ) { AttributeError_in_terminal(x, y); \
 							 return false; }
 
-#define ERROR_FIND( x, y ) { FindError(x, y); \
+#define ERROR_FIND( x, y ) { FindError_in_terminal(x, y); \
 							 return false; }
+
+#define ERROR_OPEN( x, y ) { FileopenError_in_terminal(x, y); \
+							 return false; }
+
+#define ERROR_PARSE( x, y) { ParsingError_in_terminal(x, y); \
+							 return false;}
 
 bool MapReader::MapUpload(const char * filename)
 {
-	return false;
+	std::ifstream fp;
+	fp.open(filename);
+
+	if (fp.is_open())
+	{
+		ERROR_OPEN(filename, "Please Check the file.");
+	}
+
+	std::cout << "File opend. Wait a minute." << std::endl;
+	// TODO: Calculate the processing time belong file size. 
+
+	bool exit = false;
+	std::string tag;
+	long v_index = 0, v2_index = 0;
+
+	while(!exit)
+	{
+		std::getline(fp, tag);
+		if (!fp.eof())
+		{
+			tag = "\0";
+			exit = true;
+			continue;
+		}
+
+		// XML Tag Parsing
+		v_index = tag.find("<?xml", v_index);
+		if (v_index == -1)
+		{
+			v_index = 0;
+			v_index = tag.find("<? xml", v_index);
+			if (v_index == -1)
+				continue;
+		}
+	}
+
+	if (tag == "\0")
+		ERROR_FIND("XML", "Please Check the file");
+
+	if (!Parsing_XML(tag))
+		ParsingError_in_terminal("XML", "Please Check the file");
+
+	Print_XML_in_terminal();
+
+	return true;
 }
+
+////////////////////////////////////////////////////////////////////////////////////
+
+#pragma region "Print Method"
 
 void MapReader::Print_XML_in_terminal()
 {
@@ -86,20 +141,91 @@ void MapReader::Print_Node_ID_in_terminal(int id)
 		}
 }
 
+void MapReader::Print_Way_in_terminal(TagNS::Tag_Way way)
+{
+	std::cout.setf(std::ios::fixed);
+	std::cout << "-------------------- Node Tag -----------------------" << std::endl;
+	std::cout << "	ID : " << way.id << std::endl;
+	std::cout << "	Visible : " << way.visible << std::endl;
+	std::cout << "	Version : " << way.version << std::endl;
+	std::cout << "	Changeset : " << way.changeset << std::endl;
+	std::cout << "	Timestamp : " << way.timestamp.c_str() << std::endl;
+	std::cout << "	User : " << way.user.c_str() << std::endl;
+	std::cout << "	UID : " << way.uid << std::endl;
+
+	for (int i = 0; i < way.nd.size(); i++)
+	{
+		std::cout << std::endl << i << " nd" << std::endl;
+		Print_nd(way.nd[i]);
+		std::cout << std::endl;
+	}
+
+	for (int i = 0; i < way.tag.size(); i++)
+	{
+		std::cout << std::endl << i << " Tag" << std::endl;
+		Print_Tag(way.tag[i]);
+		std::cout << std::endl;
+	}
+
+	std::cout << "----------------------------------------------------" << std::endl;
+}
+
 void MapReader::Print_Way_Index_in_terminal(int index)
 {
+	Print_Way_in_terminal(ways[index - 1]);
 }
 
 void MapReader::Print_Way_ID_in_terminal(int id)
 {
+	for (int i = 0; i < ways.size(); i++)
+		if (ways[i].id == id)
+		{
+			Print_Way_in_terminal(ways[i]);
+			break;
+		}
+}
+
+void MapReader::Print_Relation_in_terminal(TagNS::Tag_Relation rel)
+{
+	std::cout.setf(std::ios::fixed);
+	std::cout << "-------------------- Node Tag -----------------------" << std::endl;
+	std::cout << "	ID : " << rel.id << std::endl;
+	std::cout << "	Visible : " << rel.visible << std::endl;
+	std::cout << "	Version : " << rel.version << std::endl;
+	std::cout << "	Changeset : " << rel.changeset << std::endl;
+	std::cout << "	Timestamp : " << rel.timestamp.c_str() << std::endl;
+	std::cout << "	User : " << rel.user.c_str() << std::endl;
+	std::cout << "	UID : " << rel.uid << std::endl;
+
+	for (int i = 0; i < rel.member.size(); i++)
+	{
+		std::cout << std::endl << i << " nd" << std::endl;
+		Print_Member(rel.member[i]);
+		std::cout << std::endl;
+	}
+
+	for (int i = 0; i < rel.tag.size(); i++)
+	{
+		std::cout << std::endl << i << " Tag" << std::endl;
+		Print_Tag(rel.tag[i]);
+	}
+
+	std::cout << "----------------------------------------------------" << std::endl;
 }
 
 void MapReader::Print_Relation_Index_in_terminal(int index)
 {
+	Print_Relation_in_terminal(relations[index - 1]);
 }
 
 void MapReader::Print_Relation_ID_in_terminal(int id)
 {
+	for (int i = 0; i < relations.size(); i++)
+		if (ways[i].id == id)
+		{
+			Print_Relation_in_terminal(relations[i]);
+			break;
+		}
 }
 
 void MapReader::Print_Tag(TagNS::Tag_Tag tag)
@@ -110,43 +236,110 @@ void MapReader::Print_Tag(TagNS::Tag_Tag tag)
 
 void MapReader::Print_nd(TagNS::Tag_nd nd)
 {
+	std::cout << "ref : " << nd.ref << std::endl;
 }
 
 void MapReader::Print_Member(TagNS::Tag_Member member)
 {
+	std::cout << "type : " << member.type.c_str() << std::endl;
+	std::cout << "ref : " << member.ref << std::endl;
+	std::cout << "role : " << member.role.c_str() << std::endl;
 }
+
+#pragma endregion
+
+///////////////////////////////////////////////////////////////////////
+
+#pragma region "Get Some Method"
 
 bool MapReader::Get_Node_Index(TagNS::Tag_Node * Node, int index)
 {
-	return false;
+	if (nodes.size() <= index)
+	{
+		Node = nullptr;
+		return false;
+	}
+	else
+	{
+		*Node = nodes[index - 1];
+		return true;
+	}
 }
 
 bool MapReader::Get_Node_ID(TagNS::Tag_Node * Node, int id)
 {
+	for(int i = 0; i < nodes.size(); i++)
+		if (nodes[i].id == id)
+		{
+			*Node = nodes[i];
+			return true;
+		}
+
+	Node = nullptr;
 	return false;
 }
 
 bool MapReader::Get_Way_Index(TagNS::Tag_Way * way, int index)
 {
-	return false;
+	if (ways.size() <= index)
+	{
+		way = nullptr;
+		return false;
+	}
+	else
+	{
+		*way = ways[index - 1];
+		return true;
+	}
 }
 
 bool MapReader::Get_Way_ID(TagNS::Tag_Way * way, int id)
 {
+	for (int i = 0; i < ways.size(); i++)
+		if (ways[i].id == id)
+		{
+			*way = ways[i];
+			return true;
+		}
+
+	way = nullptr;
 	return false;
 }
 
 bool MapReader::Get_Relation_Index(TagNS::Tag_Relation * relation, int index)
 {
-	return false;
+	if (relations.size() <= index)
+	{
+		relation = nullptr;
+		return false;
+	}
+	else
+	{
+		*relation = relations[index - 1];
+		return true;
+	}
 }
 
 bool MapReader::Get_Relation_ID(TagNS::Tag_Relation * relation, int id)
 {
+	for (int i = 0; i < relations.size(); i++)
+		if (relations[i].id == id)
+		{
+			*relation = relations[i];
+			return true;
+		}
+
+	relation = nullptr;
 	return false;
 }
 
-bool MapReader::Parshing_XML(std::string tag_line)
+#pragma endregion
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+#pragma region "Parsing Method"
+
+bool MapReader::Parsing_XML(std::string tag_line)
 {
 	std::string s_encoding;
 	double d_version;
@@ -163,7 +356,7 @@ bool MapReader::Parshing_XML(std::string tag_line)
 	return true;
 }
 
-bool MapReader::Parshing_OSM(std::string tag_line)
+bool MapReader::Parsing_OSM(std::string tag_line)
 {
 	double d_version;
 	std::string s_generator;
@@ -195,7 +388,7 @@ bool MapReader::Parshing_OSM(std::string tag_line)
 	return true;
 }
 
-bool MapReader::Parshing_Bounds(std::string tag_line)
+bool MapReader::Parsing_Bounds(std::string tag_line)
 {
 	double d_minlat;
 	double d_minlon;
@@ -222,7 +415,7 @@ bool MapReader::Parshing_Bounds(std::string tag_line)
 	return true;
 }
 
-bool MapReader::Parshing_Node(std::string tag_line)
+bool MapReader::Parsing_Node(std::string tag_line)
 {
 	long l_id;
 	bool b_visible;
@@ -293,7 +486,7 @@ bool MapReader::Parshing_Node(std::string tag_line)
 	return true;
 }
 
-bool MapReader::Parshing_Way(std::string tag_line)
+bool MapReader::Parsing_Way(std::string tag_line)
 {
 	long l_id;
 	bool b_visible;
@@ -376,7 +569,7 @@ bool MapReader::Parshing_Way(std::string tag_line)
 	return true;
 }
 
-bool MapReader::Parshing_Relation(std::string tag_line)
+bool MapReader::Parsing_Relation(std::string tag_line)
 {
 	long l_id;
 	bool b_visible;
@@ -459,3 +652,5 @@ bool MapReader::Parshing_Relation(std::string tag_line)
 
 	return true;
 }
+
+#pragma endregion

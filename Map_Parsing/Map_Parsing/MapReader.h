@@ -25,10 +25,11 @@ public:
 	void Print_Node_Index_in_terminal(int index);
 	void Print_Node_ID_in_terminal(int id);
 
-	void Print_Way_in_terminal(TagNS::Tag_Way node);
+	void Print_Way_in_terminal(TagNS::Tag_Way way);
 	void Print_Way_Index_in_terminal(int index);
 	void Print_Way_ID_in_terminal(int id);
 
+	void Print_Relation_in_terminal(TagNS::Tag_Relation rel);
 	void Print_Relation_Index_in_terminal(int index);
 	void Print_Relation_ID_in_terminal(int id);
 
@@ -56,17 +57,17 @@ public:
 	bool Get_Relation_ID(TagNS::Tag_Relation * relation, int id);
 
 private:
-	bool Parshing_XML(std::string tag_line);
+	bool Parsing_XML(std::string tag_line);
 
-	bool Parshing_OSM(std::string tag_line);
+	bool Parsing_OSM(std::string tag_line);
 
-	bool Parshing_Bounds(std::string tag_line);
+	bool Parsing_Bounds(std::string tag_line);
 
-	bool Parshing_Node(std::string tag_line);
+	bool Parsing_Node(std::string tag_line);
 
-	bool Parshing_Way(std::string tag_line);
+	bool Parsing_Way(std::string tag_line);
 
-	bool Parshing_Relation(std::string tag_line);
+	bool Parsing_Relation(std::string tag_line);
 
 public:
 	TagNS::C_Tag_All * all;
