@@ -8,8 +8,8 @@
 class MapReader
 {
 public:
-	MapReader(void) { };
-	MapReader(const char * filename) { MapUpload(filename); }
+	MapReader(void);
+	MapReader(const char * filename);
 
 	bool MapUpload(const char * filename);
 
@@ -45,15 +45,15 @@ public:
 	TagNS::Tag_Bounds* Get_Bounds() { return bounds; }
 
 	std::vector<TagNS::Tag_Node> Get_Nodes() { return nodes; }
-	bool Get_Node_Index(TagNS::Tag_Node * Node, int index);
+	bool Get_Node_Index(TagNS::Tag_Node * Node, unsigned int index);
 	bool Get_Node_ID(TagNS::Tag_Node * Node, int id);
 
 	std::vector<TagNS::Tag_Way> Get_Ways() { return ways; }
-	bool Get_Way_Index(TagNS::Tag_Way * way, int index);
+	bool Get_Way_Index(TagNS::Tag_Way * way, unsigned int index);
 	bool Get_Way_ID(TagNS::Tag_Way * way, int id);
 
 	std::vector<TagNS::Tag_Relation> Get_Relations() { return relations; }
-	bool Get_Relation_Index(TagNS::Tag_Relation * relation, int index);
+	bool Get_Relation_Index(TagNS::Tag_Relation * relation, unsigned int index);
 	bool Get_Relation_ID(TagNS::Tag_Relation * relation, int id);
 
 private:
@@ -70,7 +70,7 @@ private:
 	bool Parsing_Relation(std::string tag_line);
 
 public:
-	TagNS::C_Tag_All * all;
+	TagNS::Tag_ALL * all;
 	TagNS::Tag_XML * xml;
 	TagNS::Tag_OSM * osm;
 	TagNS::Tag_Bounds * bounds;

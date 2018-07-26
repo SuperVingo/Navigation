@@ -19,7 +19,7 @@ bool GetMember(std::string tag, TagNS::Tag_Member * value);
 
 inline void FindError_in_terminal(const char * name, const char * Additional = " ")
 {
-	std::cout << "Can't find" << name << "." << Additional << std::endl;
+	std::cout << "Can't find \"" << name << "\". " << Additional << std::endl;
 }
 
 inline void AttributeError_in_terminal(const char * Attribute, const char * Additional = " ")

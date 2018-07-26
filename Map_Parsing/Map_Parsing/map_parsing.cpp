@@ -9,11 +9,11 @@
 bool GetAttribute(std::string tag, const char name[], int * value)
 {
 	int v_index, v2_index, ivalue;
-	char * c_name = (char*)name;
+	std::string c_name = name;
 
-	strcat_s(c_name, sizeof(name), "=\"");
+	c_name += "=\"";
 
-	v_index = tag.find(c_name);
+	v_index = tag.find(c_name) + c_name.size();
 	v2_index = tag.find("\"", v_index);
 
 	if (v_index == -1 || v2_index == -1)
@@ -39,11 +39,11 @@ bool GetAttribute(std::string tag, const char name[], long * value)
 {
 	int v_index, v2_index;
 	long lvalue;
-	char * c_name = (char*)name;
+	std::string c_name = name;
 
-	strcat_s(c_name, sizeof(name), "=\"");
+	c_name += "=\"";
 
-	v_index = tag.find(c_name);
+	v_index = tag.find(c_name) + c_name.size();
 	v2_index = tag.find('"', v_index);
 
 	if (v_index == -1 || v2_index == -1)
@@ -67,12 +67,12 @@ bool GetAttribute(std::string tag, const char name[], double * value)
 {
 	int v_index, v2_index;
 	double dvalue;
-	char * c_name = (char*)name;
+	std::string c_name = name;
 
-	strcat_s(c_name, sizeof(name), "=\"");
+	c_name += "=\"";
 
-	v_index = tag.find(c_name);
-	v2_index = tag.find('"', v_index);
+	v_index = tag.find(c_name) + c_name.size();
+	v2_index = tag.find('"', v_index + 1);
 
 	if (v_index == -1 || v2_index == -1)
 	{
@@ -95,11 +95,11 @@ bool GetAttribute(std::string tag, const char name[], double * value)
 bool GetAttribute(std::string tag, const char name[], bool * value)
 {
 	int v_index, v2_index;
-	char * c_name = (char*)name;
+	std::string c_name = name;
 
-	strcat_s(c_name, sizeof(name), "=\"");
+	c_name += "=\"";
 
-	v_index = tag.find(c_name);
+	v_index = tag.find(c_name) + c_name.size();
 	v2_index = tag.find('"', v_index);
 
 	if (v_index == -1 || v2_index == -1)
@@ -125,11 +125,11 @@ bool GetAttribute(std::string tag, const char name[], char value[])
 {
 	int v_index, v2_index;
 	std::string cvalue;
-	char * c_name = (char*)name;
+	std::string c_name = name;
 
-	strcat_s(c_name, sizeof(name), "=\"");
+	c_name += "=\"";
 
-	v_index = tag.find(c_name);
+	v_index = tag.find(c_name) + c_name.size();
 	v2_index = tag.find('"', v_index);
 
 	if (v_index == -1 || v2_index == -1)
@@ -153,11 +153,11 @@ bool GetAttribute(std::string tag, const char name[], std::string * value)
 {
 	int v_index, v2_index;
 	std::string svalue;
-	char * c_name = (char*)name;
+	std::string c_name = name;
 
-	strcat_s(c_name, sizeof(name), "=\"");
+	c_name += "=\"";
 
-	v_index = tag.find(c_name);
+	v_index = tag.find(c_name) + c_name.size();
 	v2_index = tag.find('"', v_index);
 
 	if (v_index == -1 || v2_index == -1)
