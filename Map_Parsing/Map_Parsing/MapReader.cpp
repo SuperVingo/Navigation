@@ -196,6 +196,8 @@ bool MapReader::MapUpload(const wchar_t * filename)
 
 ////////////////////////////// Node //////////////////////////////////////
 
+	fp.clear();
+	fp.seekg(0, std::ios_base::beg);
 	exit = false;
 	tag.clear();
 	std::wstring w_temp;
@@ -226,6 +228,7 @@ bool MapReader::MapUpload(const wchar_t * filename)
 		{
 			if (node == false)
 			{
+				//Find Node
 				v_index = tag.find(L"<node", 0);
 				v2_index = tag.find(L"/>", 0);
 				if (v_index == -1)
@@ -234,11 +237,13 @@ bool MapReader::MapUpload(const wchar_t * filename)
 					exit = true;
 					continue;
 				}
+				//Find Tag
 				else if(v_index != -1 && v2_index == -1)
 				{
 					node = true;
 					std::wcout << "Finding Tag..." << std::endl;
 				}
+				//No Tag, go back.
 				else if(v_index != -1 && v2_index != -1)
 				{ 
 					std::wcout << "No Tag..." << std::endl;
@@ -247,6 +252,7 @@ bool MapReader::MapUpload(const wchar_t * filename)
 			}
 			else
 			{
+				//find tag
 				memset(temp, 0, sizeof(temp));
 
 				fp.getline(temp, 250);
@@ -257,7 +263,7 @@ bool MapReader::MapUpload(const wchar_t * filename)
 				if (v_index == -1)
 				{
 					v_index = w_temp.find(L"</node>", 0);
-					if (v_index != -1)
+					if (v_index != -1) // Node End. go back.
 					{
 						tag += w_temp;
 						break;
@@ -266,7 +272,7 @@ bool MapReader::MapUpload(const wchar_t * filename)
 				}
 				else
 				{
-
+					//Find Tag, And Add
 					std::wcout.clear();
 					std::wcout << "Tag Finded..." << w_temp << std::endl;
 					tag += w_temp;
@@ -315,6 +321,7 @@ bool MapReader::MapUpload(const wchar_t * filename)
 
 		while (!exit)
 		{
+			//Find Way
 			if (way == false)
 			{
 				v_index = tag.find(L"<way", 0);
@@ -325,11 +332,13 @@ bool MapReader::MapUpload(const wchar_t * filename)
 					exit = true;
 					continue;
 				}
+				//Find nd Tag
 				else if (v_index != -1 && v2_index == -1)
 				{
 					way = true;
 					std::wcout << "Finding nd Tag..." << std::endl;
 				}
+				//No nd Tag, go back.
 				else if (v_index != -1 && v2_index != -1)
 				{
 					std::wcout << "No nd Tag..." << std::endl;
@@ -338,6 +347,7 @@ bool MapReader::MapUpload(const wchar_t * filename)
 			}
 			else
 			{
+				//find tag
 				memset(temp, 0, sizeof(temp));
 
 				fp.getline(temp, 250);
@@ -347,7 +357,7 @@ bool MapReader::MapUpload(const wchar_t * filename)
 				v_index = w_temp.find(L"<nd", 0);
 				if (v_index == -1)
 				{
-					v_index = w_temp.find(L"</way>", 0);
+					v_index = w_temp.find(L"</way>", 0); // Way End. go back.
 					if (v_index != -1)
 					{
 						tag += w_temp;
@@ -357,7 +367,7 @@ bool MapReader::MapUpload(const wchar_t * filename)
 				}
 				else
 				{
-
+					//Find Tag, And Add
 					std::wcout.clear();
 					std::wcout << "nd Tag Finded..." << w_temp << std::endl;
 					tag += w_temp;
@@ -375,6 +385,111 @@ bool MapReader::MapUpload(const wchar_t * filename)
 		}
 	}
 
+	////////////////////////////// Find Relation //////////////////////////////////////
+
+	fp.clear();
+	fp.seekg(0, std::ios_base::beg);
+	exit = false;
+	tag.clear();
+	w_temp.clear();
+	v_index = 0, v2_index = 0;
+	bool exit_relation = false;
+
+	while (!exit_relation)
+	{
+		bool relation = false;
+		bool not_relation = false;
+		wchar_t temp[250] = { 0 };
+		tag.clear();
+		exit = false;
+
+		fp.getline(temp, 250);
+
+		tag += temp;
+
+		if (fp.eof())
+		{
+			tag = L"\0";
+			exit_relation = true;
+			continue;
+		}
+
+		while (!exit)
+		{
+			//Find relation
+			if (relation == false)
+			{
+				v_index = tag.find(L"<relation", 0);
+				v2_index = tag.find(L"/>", 0);
+				if (v_index == -1)
+				{
+					not_relation = true;
+					exit = true;
+					continue;
+				}
+				//Find Subproperty Tag
+				else if (v_index != -1 && v2_index == -1)
+				{
+					relation = true;
+					std::wcout << "Finding Subproperty Tag..." << std::endl;
+				}
+				//No Subproperty Tag, go back.
+				else if (v_index != -1 && v2_index != -1)
+				{
+					std::wcout << "No Subproperty Tag..." << std::endl;
+					break;
+				}
+			}
+			else
+			{
+				//find tag
+				memset(temp, 0, sizeof(temp));
+
+				fp.getline(temp, 250);
+
+				w_temp = temp;
+
+				v_index = w_temp.find(L"<member", 0);
+				if (v_index == -1)
+				{
+					v_index = w_temp.find(L"<tag", 0);
+					if (v_index == -1)
+					{
+						v_index = w_temp.find(L"</relation>", 0); // Relation End. go back.
+						if (v_index != -1)
+						{
+							tag += w_temp;
+							break;
+						}
+					}
+					else
+					{
+						std::wcout.clear();
+						std::wcout << "Subproperty Tag Finded..." << w_temp << std::endl;
+						tag += w_temp;
+						continue;
+					}
+				}
+				else
+				{
+					//Find Tag, And Add
+					std::wcout.clear();
+					std::wcout << "Subproperty Tag Finded..." << w_temp << std::endl;
+					tag += w_temp;
+					continue;
+				}
+			}
+		}
+
+		if (!not_relation)
+		{
+			std::wcout << tag << std::endl << std::endl;
+
+			if (!Parsing_Relation(tag))
+				ParsingError_in_terminal(L"Relation", L"Please Check the file");
+		}
+	}
+
 	////////////////////////////// Print Nodes and Ways //////////////////////////////////////
 
 	for (unsigned int i = 0; i < nodes.size(); i++)
@@ -382,6 +497,9 @@ bool MapReader::MapUpload(const wchar_t * filename)
 
 	for (unsigned int i = 0; i < ways.size(); i++)
 		Print_Way_in_terminal(ways[i]);
+
+	for (unsigned int i = 0; i < relations.size(); i++)
+		Print_Relation_in_terminal(relations[i]);
 
 	return true;
 }
@@ -513,7 +631,7 @@ void MapReader::Print_Way_ID_in_terminal(int id)
 void MapReader::Print_Relation_in_terminal(TagNS::Tag_Relation rel)
 {
 	std::wcout.setf(std::ios::fixed);
-	std::wcout << "-------------------- Node Tag -----------------------" << std::endl;
+	std::wcout << "-------------------- Relation Tag -----------------------" << std::endl;
 	std::wcout << "	ID : " << rel.id << std::endl;
 	std::wcout << "	Visible : " << rel.visible << std::endl;
 	std::wcout << "	Version : " << rel.version << std::endl;
@@ -524,14 +642,14 @@ void MapReader::Print_Relation_in_terminal(TagNS::Tag_Relation rel)
 
 	for (unsigned int i = 0; i < rel.member.size(); i++)
 	{
-		std::wcout << std::endl << i << " nd" << std::endl;
+		std::wcout << std::endl << "\t" << i << " nd" << std::endl;
 		Print_Member(rel.member[i]);
 		std::wcout << std::endl;
 	}
 
 	for (unsigned int i = 0; i < rel.tag.size(); i++)
 	{
-		std::wcout << std::endl << i << " Tag" << std::endl;
+		std::wcout << std::endl << "\t" << i << " Tag" << std::endl;
 		Print_Tag(rel.tag[i]);
 	}
 
@@ -561,14 +679,14 @@ void MapReader::Print_Tag(TagNS::Tag_Tag tag)
 
 void MapReader::Print_nd(TagNS::Tag_nd nd)
 {
-	std::wcout << "ref : " << nd.ref << std::endl;
+	std::wcout << "\t" << "ref : " << nd.ref << std::endl;
 }
 
 void MapReader::Print_Member(TagNS::Tag_Member member)
 {
-	std::wcout << "type : " << member.type.c_str() << std::endl;
-	std::wcout << "ref : " << member.ref << std::endl;
-	std::wcout << "role : " << member.role.c_str() << std::endl;
+	std::wcout << "\t" << "type : " << member.type.c_str() << std::endl;
+	std::wcout << "\t" << "ref : " << member.ref << std::endl;
+	std::wcout << "\t" << "role : " << member.role.c_str() << std::endl;
 }
 
 #pragma endregion
@@ -929,10 +1047,10 @@ bool MapReader::Parsing_Relation(std::wstring tag_line)
 		ERROR_ATTR(L"Relation - uid", L" ");
 
 	bool exit = false;
+	int v_index = 0, v2_index = 0;
 
 	while (!exit)
 	{
-		int v_index = 0, v2_index = 0;
 		v_index = tag_line.find(L"<member", v2_index + 1);
 		v2_index = tag_line.find(L"/>", v_index + 1);
 
@@ -952,10 +1070,9 @@ bool MapReader::Parsing_Relation(std::wstring tag_line)
 	}
 
 	exit = false;
-
+	v_index = 0, v2_index = 0;
 	while (!exit)
 	{
-		int v_index = 0, v2_index = 0;
 		v_index = tag_line.find(L"<tag", v2_index + 1);
 		v2_index = tag_line.find(L"/>", v_index + 1);
 

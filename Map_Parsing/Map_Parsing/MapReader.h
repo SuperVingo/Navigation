@@ -38,6 +38,7 @@ public:
 	void Print_Member(TagNS::Tag_Member member);
 
 public:
+	//Return Tag
 	TagNS::Tag_XML* Get_XML() { return xml; }
 
 	TagNS::Tag_OSM* Get_OSM() { return osm; }
@@ -57,6 +58,7 @@ public:
 	bool Get_Relation_ID(TagNS::Tag_Relation * relation, int id);
 
 private:
+	//Parsing Function
 	bool Parsing_XML(std::wstring tag_line);
 
 	bool Parsing_OSM(std::wstring tag_line);
