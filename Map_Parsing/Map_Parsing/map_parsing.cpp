@@ -6,27 +6,27 @@
 #define ERROR_FIND( x, y ) { FindError_in_terminal(x, y); \
 							 return false; }
 
-bool GetAttribute(std::string tag, const char name[], int * value)
+bool GetAttribute(std::wstring tag, const wchar_t name[], int * value)
 {
 	int v_index, v2_index, ivalue;
-	std::string c_name = name;
+	std::wstring c_name = name;
 
-	c_name += "=\"";
+	c_name += L"=\"";
 
 	v_index = tag.find(c_name) + c_name.size();
-	v2_index = tag.find("\"", v_index);
+	v2_index = tag.find(L"\"", v_index);
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		ERROR_FIND(name, " ");
+		ERROR_FIND(name, L" ");
 		value = nullptr;
 		return false;
 	}
 	else
 	{
-		std::string temp = tag.substr(v_index, v2_index - v_index);
+		std::wstring temp = tag.substr(v_index, v2_index - v_index);
 
-		ivalue = atoi(temp.c_str());
+		ivalue = _wtoi(temp.c_str());
 
 		*value = ivalue;
 	}
@@ -35,27 +35,27 @@ bool GetAttribute(std::string tag, const char name[], int * value)
 }
 
 
-bool GetAttribute(std::string tag, const char name[], long * value)
+bool GetAttribute(std::wstring tag, const wchar_t name[], unsigned long long * value)
 {
 	int v_index, v2_index;
-	long lvalue;
-	std::string c_name = name;
+	unsigned long long lvalue;
+	std::wstring c_name = name;
 
-	c_name += "=\"";
+	c_name += L"=\"";
 
 	v_index = tag.find(c_name) + c_name.size();
 	v2_index = tag.find('"', v_index);
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		ERROR_FIND(name, " ");
+		ERROR_FIND(name, L" ");
 		return false;
 	}
 	else
 	{
-		std::string temp = tag.substr(v_index, v2_index - v_index);
+		std::wstring temp = tag.substr(v_index, v2_index - v_index);
 
-		lvalue = atoi(temp.c_str());
+		lvalue = _wtoi64(temp.c_str());
 
 		*value = lvalue;
 	}
@@ -63,27 +63,27 @@ bool GetAttribute(std::string tag, const char name[], long * value)
 	return true;
 }
 
-bool GetAttribute(std::string tag, const char name[], double * value)
+bool GetAttribute(std::wstring tag, const wchar_t name[], double * value)
 {
 	int v_index, v2_index;
 	double dvalue;
-	std::string c_name = name;
+	std::wstring c_name = name;
 
-	c_name += "=\"";
+	c_name += L"=\"";
 
 	v_index = tag.find(c_name) + c_name.size();
 	v2_index = tag.find('"', v_index + 1);
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		ERROR_FIND(name, " ");
+		ERROR_FIND(name, L" ");
 		return false;
 	}
 	else
 	{
-		std::string temp = tag.substr(v_index, v2_index - v_index);
+		std::wstring temp = tag.substr(v_index, v2_index - v_index);
 
-		dvalue = atof(temp.c_str());
+		dvalue = _wtof(temp.c_str());
 
 		*value = dvalue;
 	}
@@ -92,26 +92,26 @@ bool GetAttribute(std::string tag, const char name[], double * value)
 
 }
 
-bool GetAttribute(std::string tag, const char name[], bool * value)
+bool GetAttribute(std::wstring tag, const wchar_t name[], bool * value)
 {
 	int v_index, v2_index;
-	std::string c_name = name;
+	std::wstring c_name = name;
 
-	c_name += "=\"";
+	c_name += L"=\"";
 
 	v_index = tag.find(c_name) + c_name.size();
 	v2_index = tag.find('"', v_index);
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		ERROR_FIND(name, " ");
+		ERROR_FIND(name, L" ");
 		return false;
 	}
 	else
 	{
-		std::string temp = tag.substr(v_index, v2_index - v_index);
+		std::wstring temp = tag.substr(v_index, v2_index - v_index);
 
-		if (temp == "true")
+		if (temp == L"true")
 			*value = true;
 		else
 			*value = false;
@@ -121,25 +121,25 @@ bool GetAttribute(std::string tag, const char name[], bool * value)
 
 }
 
-bool GetAttribute(std::string tag, const char name[], char value[])
+bool GetAttribute(std::wstring tag, const wchar_t name[], char value[])
 {
 	int v_index, v2_index;
-	std::string cvalue;
-	std::string c_name = name;
+	std::wstring cvalue;
+	std::wstring c_name = name;
 
-	c_name += "=\"";
+	c_name += L"=\"";
 
 	v_index = tag.find(c_name) + c_name.size();
 	v2_index = tag.find('"', v_index);
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		ERROR_FIND(name, " ");
+		ERROR_FIND(name, L" ");
 		return false;
 	}
 	else
 	{
-		std::string temp = tag.substr(v_index, v2_index - v_index);
+		std::wstring temp = tag.substr(v_index, v2_index - v_index);
 
 		cvalue = temp;
 
@@ -149,25 +149,25 @@ bool GetAttribute(std::string tag, const char name[], char value[])
 	return true;
 }
 
-bool GetAttribute(std::string tag, const char name[], std::string * value)
+bool GetAttribute(std::wstring tag, const wchar_t name[], std::wstring * value)
 {
 	int v_index, v2_index;
-	std::string svalue;
-	std::string c_name = name;
+	std::wstring svalue;
+	std::wstring c_name = name;
 
-	c_name += "=\"";
+	c_name += L"=\"";
 
 	v_index = tag.find(c_name) + c_name.size();
 	v2_index = tag.find('"', v_index);
 
 	if (v_index == -1 || v2_index == -1)
 	{
-		ERROR_FIND(name, " ");
+		ERROR_FIND(name, L" ");
 		return false;
 	}
 	else
 	{
-		std::string temp = tag.substr(v_index, v2_index - v_index);
+		std::wstring temp = tag.substr(v_index, v2_index - v_index);
 
 		svalue = temp;
 
@@ -176,48 +176,48 @@ bool GetAttribute(std::string tag, const char name[], std::string * value)
 	return true;
 }
 
-bool GetND(std::string tag, TagNS::Tag_nd * value)
+bool GetND(std::wstring tag, TagNS::Tag_nd * value)
 {
-	long ref;
+	unsigned long long ref;
 	
-	if (!GetAttribute(tag, "ref", &ref))
-		ERROR_ATTR("Tag - k", " ");
+	if (!GetAttribute(tag, L"ref", &ref))
+		ERROR_ATTR(L"Tag - k", L" ");
 
 	*value = TagNS::Tag_nd(ref);
 
 	return true;
 }
 
-bool GetTag(std::string tag, TagNS::Tag_Tag * value)
+bool GetTag(std::wstring tag, TagNS::Tag_Tag * value)
 {
-	std::string s_k;
-	std::string s_v;
+	std::wstring s_k;
+	std::wstring s_v;
 
-	if (!GetAttribute(tag, "k", &s_k))
-		ERROR_ATTR("Tag - k", " ");
+	if (!GetAttribute(tag, L"k", &s_k))
+		ERROR_ATTR(L"Tag - k", L" ");
 
-	if (!GetAttribute(tag, "v", &s_v))
-		ERROR_ATTR("Tag - v", " ");
+	if (!GetAttribute(tag, L"v", &s_v))
+		ERROR_ATTR(L"Tag - v", L" ");
 
 	*value = TagNS::Tag_Tag(s_k, s_v);
 
 	return true;
 }
 
-bool GetMember(std::string tag, TagNS::Tag_Member * value)
+bool GetMember(std::wstring tag, TagNS::Tag_Member * value)
 {
-	std::string s_type;
-	long ref;
-	std::string s_role;
+	std::wstring s_type;
+	unsigned long long ref;
+	std::wstring s_role;
 
-	if (!GetAttribute(tag, "type", &s_type))
-		ERROR_ATTR("type", " ");
+	if (!GetAttribute(tag, L"type", &s_type))
+		ERROR_ATTR(L"type", L" ");
 
-	if (!GetAttribute(tag, "ref", &ref))
-		ERROR_ATTR("ref", " ");
+	if (!GetAttribute(tag, L"ref", &ref))
+		ERROR_ATTR(L"ref", L" ");
 
-	if (!GetAttribute(tag, "role", &s_role))
-		ERROR_ATTR("role", " ");
+	if (!GetAttribute(tag, L"role", &s_role))
+		ERROR_ATTR(L"role", L" ");
 
 
 	*value = TagNS::Tag_Member(s_type, ref, s_role);

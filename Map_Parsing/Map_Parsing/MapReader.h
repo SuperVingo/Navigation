@@ -9,9 +9,9 @@ class MapReader
 {
 public:
 	MapReader(void);
-	MapReader(const char * filename);
+	MapReader(const wchar_t * filename);
 
-	bool MapUpload(const char * filename);
+	bool MapUpload(const wchar_t * filename);
 
 public:
 	// In Terminal Output
@@ -57,17 +57,17 @@ public:
 	bool Get_Relation_ID(TagNS::Tag_Relation * relation, int id);
 
 private:
-	bool Parsing_XML(std::string tag_line);
+	bool Parsing_XML(std::wstring tag_line);
 
-	bool Parsing_OSM(std::string tag_line);
+	bool Parsing_OSM(std::wstring tag_line);
 
-	bool Parsing_Bounds(std::string tag_line);
+	bool Parsing_Bounds(std::wstring tag_line);
 
-	bool Parsing_Node(std::string tag_line);
+	bool Parsing_Node(std::wstring tag_line);
 
-	bool Parsing_Way(std::string tag_line);
+	bool Parsing_Way(std::wstring tag_line);
 
-	bool Parsing_Relation(std::string tag_line);
+	bool Parsing_Relation(std::wstring tag_line);
 
 public:
 	TagNS::Tag_ALL * all;
